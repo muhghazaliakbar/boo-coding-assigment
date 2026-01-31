@@ -1,15 +1,30 @@
 'use strict';
 
 const express = require('express');
+const path = require('path');
+const db = require('./db');
+const profileRoutes = require('./routes/profile');
+
 const app = express();
-const port =  process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-// set the view engine to ejs
 app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', profileRoutes());
 
-// routes
-app.use('/', require('./routes/profile')());
+async function start() {
+  await db.connect();
+  await profileRoutes.seedDefault();
+  app.listen(port, () => {
+    console.log('Express started. Listening on %s', port);
+  });
+}
 
-// start server
-const server = app.listen(port);
-console.log('Express started. Listening on %s', port);
+if (require.main === module) {
+  start().catch((err) => {
+    console.error('Failed to start:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = app;
