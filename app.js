@@ -9,7 +9,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api', require('./routes/api'));
 app.use('/', profileRoutes());
 
 async function start() {

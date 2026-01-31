@@ -1,9 +1,9 @@
 'use strict';
 
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const { Profile, DEFAULT_IMAGE } = require('../models/Profile');
+const { isValidObjectId } = require('../lib/utils');
 
 const DEFAULT_PROFILE = {
   name: 'A Martinez',
@@ -18,10 +18,6 @@ const DEFAULT_PROFILE = {
   temperaments: '',
   image: DEFAULT_IMAGE,
 };
-
-function isValidObjectId(id) {
-  return mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === id;
-}
 
 function profileToView(profile) {
   const doc = profile.toJSON ? profile.toJSON() : profile;
@@ -72,7 +68,7 @@ module.exports = function () {
     }
   });
 
-  router.post('/', express.json(), express.urlencoded({ extended: true }), async function (req, res, next) {
+  router.post('/', async function (req, res, next) {
     const body = req.body || {};
     const profile = new Profile({
       name: body.name ?? '',
